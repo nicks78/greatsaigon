@@ -2,12 +2,6 @@ import React from "react";
 import { connect } from "react-redux";
 import Layout from "../components/layout";
 import { getList } from "../redux/data/actions";
-import {
-  BrowserView,
-  MobileView,
-  isBrowser,
-  isMobile
-} from "react-device-detect";
 import SearchBar from "../components/search-bar";
 import Map from "../components/map";
 import CardVenue from "../components/cards/card-venue";
@@ -35,21 +29,22 @@ class SearchPage extends React.Component {
   }
 
   componentWillMount() {
-    
-  }
-
-  componentDidMount() {
     if (this.props.url)
       this.setState({
         where: this.props.url.query.where,
         what: this.props.url.query.what,
         directory: this.props.url.query.directory
       }, () => {
+        console.log('WHERE', this.state.where)
         var api = `venues/search?items=1000&page=1&what=${
           this.state.what
         }&directory=${this.state.directory}&where=${this.state.where}`;
         this.props.getList(api);
       });
+  }
+
+  componentDidMount() {
+    
 
   }
 
@@ -58,7 +53,6 @@ class SearchPage extends React.Component {
       this.setState({
         result: nextProps.result.list
       });
-    console.log(this.state.result);
   }
 
   handleFilterButtons = event => {
@@ -120,7 +114,7 @@ class SearchPage extends React.Component {
     if (!this.state.where || !this.state.what || !this.state.directory) {
       return <Loader />;
     }
-
+    console.log('WHERE', this.state.where)
     const { where, what, directory, result, drop_what } = this.state;
 
     return (
