@@ -25,18 +25,18 @@ export default class MoreButton extends React.Component {
                 <style jsx global>{`
                     button {
                         width: 100%;
+                        height: 20px;
                         padding: 16px;
                         margin-top: 16px;
                         border: none;
                         color: #FFF;
-                        background-color: #ff0000;
+                        background-color: #f50633;
                         border-radius: 8px;
                         font-size: 16px;
                       }
 
                       button:focus {
                           outline: none;
-                          w
                       }
       
                       button:hover {

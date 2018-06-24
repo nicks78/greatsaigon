@@ -1,30 +1,34 @@
 //greatsaigon/components/Cards/card-event.js
 import Countdown from 'react-countdown-now';
+import {DEFAULT_IMG} from '../../api/constant'
 import Link from 'next/link'
 
 const CardEvent = (props) => {
 
     const {event} = props;
-    var image = event.image.medium
+
     return (
             <div style={{ marginBottom: '30px' }}>
             <div className="CardEvent">
                 <div className="Img uk-inline">
-                    <span className={`badge ${event.id % 2 == 0 ? 'Expired' : 'Book'} `}>{event.id % 2 == 0 ? 'Expired' : 'Book'}</span>
-                        <img src={image} alt="lol"/>
+                    <span className={`badge ${event.is_expired ? 'Expired' : 'Book'} `}>{event.is_expired ? 'Expired' : 'Book'}</span>
+                        <img src={ event.img !== null ? event.img.path : DEFAULT_IMG } alt={ event.img !== null ? event.img.title : 'default' }/>
                     <div className="uk-overlay uk-overlay-primary uk-position-bottom">
-                        <p><Countdown date={ Date.now() + 100000000} /></p>
+                        <p><Countdown date={ Date.now() + 100000 } /></p>
                     </div>
                 </div>
                 <div className="Text">
-                    <Link  href={`/event-profile/${event.id}`}><h3>{ event.name }</h3></Link>
-                    <p style={{ margin: '10px 0px 5px 0px' }}><i data-uk-icon="calendar"></i> { event.premiered }</p>
-                    <p><i data-uk-icon="location"></i> 135 Nguyen Hue, District 1, Ho Chi Minh City Vietnam</p>
-                    
+                    <Link   prefetch href={`/profile-event/?slug=${event.slug}?id=${event.id}`} 
+                            as={`/profile-event/${event.slug}/${event.id}`}>
+                            <h3>{ event.name }</h3>
+                    </Link>
+                    <p style={{ margin: '10px 0px 5px 0px' }}><i data-uk-icon="calendar"></i> { event.oTimes.open }</p>
+                    <p><i data-uk-icon="location"></i>{ event.address }&nbsp;{ event.ward }&nbsp;{ event.city }</p>
+                    <p style={{ marginTop: '10px' }}>{ event.description !== null && event.description.slice(0, 20) }... </p>
                     <p style={{ position: 'absolute', bottom: '10px', width: '94%', borderTop: '1px solid #ccc', paddingTop: '10px' }}>
                     
                         <i className="uk-margin-right" data-uk-icon="clock"></i>
-                        {event.schedule.time}&nbsp;{event.schedule.day}
+                       
                     </p>
                 </div>
             </div>

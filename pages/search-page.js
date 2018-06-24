@@ -1,134 +1,219 @@
-import React from 'react';
-import Layout from '../components/layout.js'
-import {API_ENDPOINT} from '../api/constant'
-import Router from 'next/router'
-import SearchBar from '../components/search-bar'
-import fetch from 'isomorphic-unfetch'
-import Map from '../components/map'
-import CardVenue from '../components/cards/card-venue';
-import Filter from '../components/search-bar/filter'
+import React from "react";
+import { connect } from "react-redux";
+import Layout from "../components/layout";
+import { getList } from "../redux/data/actions";
+import {
+  BrowserView,
+  MobileView,
+  isBrowser,
+  isMobile
+} from "react-device-detect";
+import SearchBar from "../components/search-bar";
+import Map from "../components/map";
+import CardVenue from "../components/cards/card-venue";
+import Filter from "../components/filters/filter";
+import Page from "../components/page";
+import Loader from "../components/loader";
+import axios from "axios";
+import _ from "lodash";
 
 class SearchPage extends React.Component {
-
   constructor() {
-
-    super()
+    super();
 
     this.state = {
-      what: '1',
-      where: '1',
-      directory: '1',
+      what: "1",
+      where: "",
+      directory: "1",
+      next: 10,
+      prev: 0,
+      page: 1,
+      isToggle: false,
+      stockResult: [],
       result: []
+    };
+  }
+
+  componentWillMount() {
+    if (this.props.url)
+      this.setState({
+        where: this.props.url.query.where,
+        what: this.props.url.query.what,
+        directory: this.props.url.query.directory
+      });
+  }
+
+  componentDidMount() {
+    var api = `venues/search?items=1000&page=1&what=${
+      this.state.what
+    }&directory=${this.state.directory}&where=${this.state.where}`;
+    this.props.getList(api);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.url)
+      this.setState({
+        result: nextProps.result.list
+      });
+    console.log(this.state.result);
+  }
+
+  handleFilterButtons = event => {
+    var filterIcons = event.target.getAttribute("name");
+    var valueInput = event.target.value;
+    var apiFilters = `https://backend.greatsaigon.com/api/v1/en/directories/${
+      this.state.directory
+    }/venues`;
+    axios
+      .get(apiFilters)
+      .then(response => {
+        let result;
+
+        response.data.forEach(req => {
+          if (filterIcons === "Hair") {
+            if (req.options.beauty.hair.treatment !== "0") {
+              req.options.beauty.hair.treatment.forEach(res => {
+                if (res === valueInput) {
+                  result = req;
+                  this.state.stockResult.unshift(result);
+                }
+              });
+            }
+          } else if (filterIcons === "Nails") {
+            if (req.options.beauty.nails.treatment !== "0") {
+              req.options.beauty.nails.treatment.forEach(res => {
+                if (res === valueInput) {
+                  result = req;
+                  this.state.stockResult.unshift(result);
+                }
+              });
+            }
+          } else if (filterIcons === "Spa & Massage") {
+            if (req.options.beauty.spa.treatment !== "0") {
+              req.options.beauty.spa.treatment.forEach(res => {
+                if (res === valueInput) {
+                  result = req;
+                  this.state.stockResult.unshift(result);
+                }
+              });
+            }
+          }
+        });
+
+        this.setState({
+          result: _.uniq(this.state.stockResult)
+        });
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
+  };
+
+  render() {
+    console.log(this.state.stockResult);
+    if (this.props.result.isFecthing) {
+      return <Loader />;
     }
-  }
-
-  componentWillMount(){
-    if(this.props.url)
-    this.setState({
-      where: this.props.url.query.where,
-      what: this.props.url.query.what,
-      directory: this.props.url.query.directory
-    })
-  }
-
-  componentWillReceiveProps(nextProps){
-    if(this.props.url)
-    this.setState({
-      where: nextProps.url.query.where,
-      what: nextProps.url.query.what,
-      directory: nextProps.url.query.directory
-    })
-  }
-
-  render(){
 
     const { where, what, directory, result, drop_what } = this.state;
 
     return (
-        <Layout>
-          
-          <div className="wrapper uk-width-1-1">
-            <div className="wrapper-search-bar">
-              <SearchBar what={what} where={where} directory={directory}/> 
+      <Layout>
+        <div className="wrapper-search-bar">
+          <SearchBar what={what} where={where} directory={directory} />
+        </div>
 
-              
+        <div className="content">
+          <div data-uk-grid>
+            {this.state.directory === "beauty" && (
+              <div className="uk-width-auto@m">
+                <Filter onClick={this.handleFilterButtons} />
+              </div>
+            )}
+            <div
+              style={{
+                height: "100vh",
+                overflow: "auto"
+              }}
+              className="gs-scroll-section uk-width-expand@m"
+            >
+              {!result.status ? (
+                result.map((x, index) => {
+                  return (
+                    <div key={index} style={{ marginBottom: "10px" }}>
+                      <CardVenue venue={x} />
+                    </div>
+                  );
+                })
+              ) : (
+                <p>{result.msg}</p>
+              )}
+            </div>
+
+            <div
+              style={{ zIndex: "980" }}
+              id="map"
+              className="uk-width-1-3@m"
+              data-uk-scrollspy="cls: uk-animation-slide-right; repeat: false"
+            >
+              {!result.status ? <Map result={result} isSingle={false} /> : null}
             </div>
           </div>
-          <div className="content">
-            <div className="" data-uk-grid>
-
-                <div className="uk-width-expand@m" >
-                {
-                  this.props.result.slice(0,10).map((x, index) => {
-                    return <div key={ index } style={{ marginBottom: '10px' }}>
-                      <CardVenue venue={ x } /></div>
-                  })
-                }
-                </div>
-
-                <div id="map" className="uk-width-1-3">
-                  <Map  result={ this.props.result } 
-                        isSingle={false}/>
-                </div>
-            </div>
-          </div>
-            
-              
-          <style jsx global>{`
-
-          .wrapper {
-            background-color: #eee;
-            padding: 10px;
-          }
-          .wrapper-search-bar {
-            width: 60%;
-            margin: 0 auto;
-            padding-top: 10px;
-          }
-          .content {
-            margin: 1em auto;
-            max-width: 90% !important;
-          }
-          #map {
-            height: 100vh;
-          }
-          @media(max-width: 960px) {
+        </div>
+        <style jsx global>
+          {`
             .content {
-              margin: 0 auto;
-              width: 100%;
+              background-color: #f1f1f2;
+              border-bottom: 1px solid #d0d2d3;
+              margin: 1em auto;
+              max-width: 100% !important;
             }
-            .wrapper-search-bar {
-              width: 90%;
-              padding-top: 1em;
+            .filters_icon {
+              display: grid;
+              grid-template-columns: repeat(2, 1fr);
             }
-          }
-      `}</style> 
-        </Layout>
-    )
+            .fas {
+              cursor: pointer;
+            }
+            #map {
+              height: 100vh;
+            }
+            @media (max-width: 960px) {
+              .content {
+                margin: 0 auto;
+                width: 100%;
+              }
+              #map {
+                display: none !important;
+              }
+              .gs-scroll-section {
+                overflow: ;
+              }
+            }
+          `}
+        </style>
+      </Layout>
+    );
   }
 }
 
-SearchPage.getInitialProps = async function(context) {
+// Get all data for child components
+const mapStateToProps = state => {
+  return {
+    result: state.dataReducer
+  };
+};
 
-    var what = context.query.what
-    var where = context.query.where 
-    var directory = context.query.directory  
+// Get all data for child components
+const mapDispatchToProps = dispatch => {
+  return {
+    getList: api => dispatch(getList(api))
+  };
+};
 
-    //venues/search?items=10&page=1&what=${what}&where=${where}
-    /**
-     * 
-     * API CALL 
-     * @param context.query.directory
-     * 
-    */
-    const res = await fetch(`${API_ENDPOINT}directories/${what}/venues`, {
-    })
-  
-    const data = await res.json();
-
-    return {
-      result: data
-    }
-  }
-
-export default SearchPage;
+export default Page(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(SearchPage)
+);

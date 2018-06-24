@@ -19,7 +19,7 @@ app.prepare()
 
   server.get('/profile-article/:slug/:id', (req, res) => {
     const actualPage = '/profile-article';
-    const queryParams = { slug: req.params.slug, id: req.query.id } 
+    const queryParams = { slug: req.params.slug, id: req.params.id } 
     app.render(req, res, actualPage, queryParams)
   })
 
@@ -29,7 +29,7 @@ app.prepare()
   })
   server.get('/profile-event/:slug/:id', (req, res) => {
     const actualPage = '/profile-event';
-    const queryParams = { slug: req.params.slug, id: req.query.id } 
+    const queryParams = { slug: req.params.slug, id: req.params.id } 
     app.render(req, res, actualPage, queryParams)
   })
 

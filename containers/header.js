@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import {API_ENDPOINT} from '../api/constant'
+import {connect} from 'react-redux'
 import Link from 'next/link'
 import Menu from '../components/navigations/menu';
 import Offcanvas from '../components/navigations/offcanvas'
@@ -18,18 +18,11 @@ class Header extends React.Component {
   };
 
   componentDidMount(){
-   
-    // NOT YET WORKING / TO BE FIXED 
-    fetch(`${API_ENDPOINT}directories`, {
-      mode: 'cors'
-    })
-    .then( response => {
-      return response.json()
-    })
-    .then(data => {
-      console.log(data)
-      this.setState({ menu: data })
-    })
+    this.setState({ menu: this.props.menu.menu})
+  }
+
+  componentWillReceiveProps(nextProps){
+    this.setState({ menu: nextProps.menu.menu})
   }
 
   toggleDrawer = (side, open) => () => {
@@ -45,6 +38,14 @@ class Header extends React.Component {
 
 
   render() {
+  
+  if(this.props.menu.isFetching){
+    return null
+  }
+  if(this.state.menu === undefined){
+    return null 
+  }
+
   const {menu} = this.state;
 
     return (
@@ -57,4 +58,11 @@ class Header extends React.Component {
   }
 }
 
-export default Header;
+
+const mapStateToProps = ( state ) => {
+  return {
+      menu: state.menuReducer
+  }
+}
+
+export default connect(mapStateToProps)(Header);

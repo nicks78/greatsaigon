@@ -1,28 +1,35 @@
 //greatsaigon/components/Cards/card-article.js
+import Link from 'next/link'
+import {DEFAULT_IMG} from '../../api/constant'
 
 const CardArticle = (props) => {
 
-    const {article, index } = props
+    const {article, index } = props;
 
-    var toggle = index % 2 == 0 ; // Toggle between classes 
     return (<article className="uk-comment uk-comment-primary">
                 <header className="uk-comment-header uk-grid-medium uk-flex-middle" data-uk-grid>
                     <div className="uk-width-auto">
-                        <img className="uk-comment-avatar" src={ article.image.medium } width="80" height="80" alt="" />
+                        <img className="uk-comment-avatar" src={ article.image|| DEFAULT_IMG } width="80" height="80" alt="" />
                     </div>
                     <div className="uk-width-expand">
-                        <h4 className="uk-comment-title uk-margin-remove"><a className="uk-link-reset" href="#">{ article.name }</a></h4>
+                        <h4 className="uk-comment-title uk-margin-remove"><a className="uk-link-reset" href="#">{ article.title }</a></h4>
                         <ul className="uk-comment-meta uk-subnav uk-subnav-divider uk-margin-remove-top">
-                            <li><a href="#">{article.premiered}</a></li>
-                            <li><a href="#">{article.schedule.time}</a></li>
+                            <li><a href="#">{article.published_date}</a></li>
                         </ul>
                     </div>
                 </header>
                 <div className="uk-comment-body">
-                    <p>{article.summary.slice(0, 120)}...</p>
+                    <p>{article.content}...</p>
                 </div>
                 <hr />
-                <button className="uk-button uk-button-text">View more</button>
+                <Link  prefetch href={`/profile-article/?slug=${article.slug}?id=${article.id}`} 
+                        as={`/profile-article/${article.slug}/${article.id}`}><a className="uk-button uk-button-text">View more</a>
+                </Link>
+                <style jsx global>{`
+              .uk-comment-primary {
+                box-shadow: 1px 2px 5px gray;
+              }
+        `}</style>
             </article>
     )
 }

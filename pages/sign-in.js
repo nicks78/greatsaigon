@@ -1,6 +1,8 @@
 import React from 'react';
 import Layout from '../components/layout.js'
+import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
+import Page from '../components/page'
 import { isMobile } from 'react-device-detect'
 import Button from '../components/buttons/button'
 import locales from '../locales/en.json'
@@ -27,8 +29,10 @@ class SignIn extends React.Component {
     }
 
     handleSubmit = () => {
-        // Do somthing after submition
-        console.log('Did submit')
+        // Do something after submition
+        // Call redux action
+        
+
     }
 
 
@@ -37,7 +41,7 @@ class SignIn extends React.Component {
     const { email, password} = this.state
         return (
             <Layout>
-                <div className="loginPage" style={{ margin: '0 auto', marginTop: '7%', paddingBottom: '3em', boxShadow: '0px 5px 18px gray', backgroundColor: '#f8f8f8' }}>
+                <div className="loginPage" style={{ marginBottom: '2em', margin: '0 auto', marginTop: '7%', paddingBottom: '3em', boxShadow: '0px 5px 18px gray', backgroundColor: '#f8f8f8' }}>
                     <div className="HeaderH1">
                         <h1>{ locales.h1_page_login }</h1>
                     </div>
@@ -89,4 +93,18 @@ SignIn.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default SignIn;
+// Get all data for child components
+const mapStateToProps = (state) => {
+    return {
+        auth: state.authReducer,
+    }
+  }
+  
+// Get all data for child components
+const mapDispatchToProps = (dispatch) => {
+    return {
+        getAuth : () => dispatch(getAuth())
+    }
+}
+
+export default Page(connect(mapStateToProps, mapDispatchToProps)(SignIn));
