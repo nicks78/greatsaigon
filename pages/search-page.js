@@ -35,19 +35,22 @@ class SearchPage extends React.Component {
   }
 
   componentWillMount() {
+    
+  }
+
+  componentDidMount() {
     if (this.props.url)
       this.setState({
         where: this.props.url.query.where,
         what: this.props.url.query.what,
         directory: this.props.url.query.directory
+      }, () => {
+        var api = `venues/search?items=1000&page=1&what=${
+          this.state.what
+        }&directory=${this.state.directory}&where=${this.state.where}`;
+        this.props.getList(api);
       });
-  }
 
-  componentDidMount() {
-    var api = `venues/search?items=1000&page=1&what=${
-      this.state.what
-    }&directory=${this.state.directory}&where=${this.state.where}`;
-    this.props.getList(api);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -112,6 +115,9 @@ class SearchPage extends React.Component {
   render() {
     console.log(this.state.stockResult);
     if (this.props.result.isFecthing) {
+      return <Loader />;
+    }
+    if (!this.state.where || !this.state.what || !this.state.directory) {
       return <Loader />;
     }
 
