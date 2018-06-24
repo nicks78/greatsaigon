@@ -1,6 +1,6 @@
 import Header from '../containers/header'
 import Head from 'next/head'
-import Footer from './footer/footer'
+import Footer from './footer/Footer'
 
 
 if (typeof window !== 'undefined') { 
