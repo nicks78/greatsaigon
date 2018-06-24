@@ -1,26 +1,22 @@
 import React from "react";
+import {PUBLIC_URL} from '../../api/constant'
 import Link from "next/link";
 import Router from "next/router";
 
 const Dropdown = props => {
   const { menu } = props;
 
-  // if(menu === undefined ){
-  //     return <p>Loading...</p>
-  // }
-  const goToLink = (href, as) => {
-    Router.replace(href, as);
-  };
+  const handleSearch = ( href, as ) => {
+    window.location.href = `${PUBLIC_URL}${as}`
+  }
 
   const loopMenu = (menu, x, y) => {
     return menu.slice(x, y).map((x, index) => {
       return (
         <div key={index} style={{ marginBottom: "20px", color: "#000" }}>
           <Link
-            as={`/search-page/${x.slug}/1/1`}
-            href={`/search-page/?directories=${
-              x.slug
-            }/?where=1/?what=1`}
+            as={`/search-page/${x.slug}/district-1/1`}
+            href={`/search-page?directory=${ x.slug }&where=1&what=1`}
           >
             <p className="directories">
               {x.name}
@@ -30,14 +26,12 @@ const Dropdown = props => {
 
           {x.subdirectory.map((z, index) => {
             var as = `/search-page/${x.slug}/1/${z.slug}`;
-            var href = `/search-page/?directories=${
-              x.slug
-            }/?where=1/?what=${z.slug}`;
+            var href = `/search-page?directory=${ x.slug }&where=1&what=${z.slug}`;
             return (
               <p
                 key={index}
                 onClick={() => {
-                  return goToLink(href, as);
+                  return handleSearch(href, as);
                 }}
                 className="uk-button-text"
                 style={{ color: "black", margin: "0px 0px 0px 20px" }}

@@ -1,11 +1,6 @@
 //pages/index.js
-
-// Redux
-// import Page from '../components/page'
-// import {connect} from 'react-redux'
-
 import Layout from "../components/layout.js";
-
+import Router from 'next/router'
 import locales from "../locales/en.json";
 import SearchBar from "../components/search-bar";
 
@@ -20,8 +15,11 @@ const Index = props => {
     "http://blisssaigon.com/wp-content/uploads/2018/05/Feature-event.jpg"
   ];
 
-  // Previous Background
-  // style={{backgroundImage: 'url(https://c1.staticflickr.com/9/8148/7644863446_5bace673c9_b.jpg)'}}
+  const handleSearch = ( directory, where, what ) => {
+    var as = `/search-page/${directory || 'food-and-drink' }/${where || 'district-1'}/${what || 'restaurant'}`
+    var href = `/search-page?directory=${directory || 'food-and-drink' }&where=${where || ''}&what=${what || 'restaurant'}`
+    Router.push(href, as, {shallow:true})
+  }
 
   return (
     <div>
@@ -37,7 +35,7 @@ const Index = props => {
           />
 
           <div className="wrapper-search-bar">
-            <SearchBar images={carousels} />
+            <SearchBar what="1" where="" directory="1" images={carousels} handleSearch={ handleSearch } />
           </div>
         </div>
 

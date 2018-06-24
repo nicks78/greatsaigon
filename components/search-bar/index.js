@@ -1,15 +1,8 @@
 import React from 'react'
-import {connect} from 'react-redux'
-import Page from '../page'
 import {API_ENDPOINT} from '../../api/constant'
 import StaticData from '../../static-data/static-data'
 import locales from '../../locales/en.json'
-import renderHTML from 'react-render-html';
-import Router from 'next/router'
-import SearchPage from '../../pages/search-page'
-// Component
-import TagHolder from './tag-holder'
-import Input from '../forms/input'
+
 
 class SearchBar extends React.Component {
 
@@ -34,6 +27,14 @@ class SearchBar extends React.Component {
       where: this.props.where || '',
       what: this.props.what || '1',
       directory: this.props.directory || '1'
+    })
+  }
+
+  componentWillReceiveProps(nextProps){
+    this.setState({
+      where: nextProps.where || '',
+      what: nextProps.what || '1',
+      directory: nextProps.directory || '1'
     })
   }
 
@@ -87,16 +88,11 @@ class SearchBar extends React.Component {
         }
 
         this.setState({ [name]: value, drop_what: dir ? what : this.state.drop_what })
-    }  
-
-    goToLink = (href, as) => {
-      Router.replace(href, as, {shallow: true})
-    }
+    }      
 
     render() {
 
       const { where, what, directory, drop_where, drop_what, drop_directory, result } = this.state;
-
 
       return (
             
@@ -144,10 +140,9 @@ class SearchBar extends React.Component {
 
                     <div className="uk-inline">
                         <i className="uk-form-icon"  className="uk-form-icon uk-form-icon-flip fas fa-search fa-lg" style={{ color: 'white' }}></i>
-                        <input onClick={ () => { this.goToLink(
-                            `/search-page/?directory=${directory || 'food-and-drink' }/?where=${where || '1'}/?what=${what || 'restaurant'}`,
-                            `/search-page/${directory || 'food-and-drink' }/${where || '1'}/${what || 'restaurant'}`
-                        ) } } type="submit" value={ locales.search } className="submit uk-input" />
+  
+                        <input onClick={ () => { this.props.handleSearch( directory, where, what ) } } type="submit" value={ locales.search } className="submit uk-input" />
+
                     </div>
                 </div>
                   <style jsx global>{`

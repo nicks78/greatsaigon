@@ -1,5 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
+import Router from 'next/router'
 import Layout from "../components/layout";
 import { getList } from "../redux/data/actions";
 import SearchBar from "../components/search-bar";
@@ -28,31 +29,46 @@ class SearchPage extends React.Component {
     };
   }
 
-  componentWillMount() {
-    if (this.props.url)
-      this.setState({
-        where: this.props.url.query.where,
-        what: this.props.url.query.what,
-        directory: this.props.url.query.directory
-      }, () => {
-        console.log('WHERE', this.state.where)
-        var api = `venues/search?items=1000&page=1&what=${
-          this.state.what
-        }&directory=${this.state.directory}&where=${this.state.where}`;
-        this.props.getList(api);
-      });
-  }
-
   componentDidMount() {
-    
-
+    if (this.props.url)
+      this.updateResult();
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log('NEXT', nextProps.url.query.what)
     if (nextProps.url)
       this.setState({
-        result: nextProps.result.list
+        result: nextProps.result.list,
+        what: nextProps.url.query.what,
+        where: nextProps.url.query.where,
+        directory: nextProps.url.query.directory
       });
+  }
+
+  updateResult() {
+    this.setState({
+      where: this.props.url.query.where,
+      what: this.props.url.query.what,
+      directory: this.props.url.query.directory
+    }, () => {
+      console.log('WHERE-2', this.state.where)
+      var api = `venues/search?items=1000&page=1&what=${
+        this.state.what
+      }&directory=${this.state.directory}&where=${this.state.where}`;
+      
+      this.props.getList(api);
+    })
+  }
+
+  handleSearch = ( directory, where, what ) => {
+    var as = `/search-page/${directory || 'food-and-drink' }/${where || ''}/${what || 'restaurant'}`
+    var href = `/search-page?directory=${directory || 'food-and-drink' }&where=${where || '1'}&what=${what || 'restaurant'}`
+    Router.replace(href, as, {shallow: true})
+    var api = `venues/search?items=1000&page=1&what=${
+      what
+    }&directory=${directory}&where=${where}`;
+    this.props.getList(api);
+
   }
 
   handleFilterButtons = event => {
@@ -107,20 +123,17 @@ class SearchPage extends React.Component {
   };
 
   render() {
-    console.log(this.state.stockResult);
+
     if (this.props.result.isFecthing) {
       return <Loader />;
     }
-    if (!this.state.where || !this.state.what || !this.state.directory) {
-      return <Loader />;
-    }
-    console.log('WHERE', this.state.where)
+
     const { where, what, directory, result, drop_what } = this.state;
 
     return (
       <Layout>
         <div className="wrapper-search-bar">
-          <SearchBar what={what} where={where} directory={directory} />
+          <SearchBar what={what} where={where} directory={directory} handleSearch={ this.handleSearch }/>
         </div>
 
         <div className="content">
